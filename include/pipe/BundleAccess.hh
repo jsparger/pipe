@@ -31,10 +31,10 @@ public:
 		MessageBundle::MessageMap& map = getMap(*bundle.get());
 		
 		// check to see if bundle contains message of type T, if not, return false.
-		if (map.count(T::MessageType) == 0) { return false; }
+		if (map.count(T::GetMessageType()) == 0) { return false; }
 		
 		// get the message. Store the unwrapped object in "message" and signal success.
-		boost::any wrapped = map[T::MessageType];
+		boost::any wrapped = map[T::GetMessageType()];
 		message = boost::any_cast<T>(wrapped);
 		return true;
 	}
@@ -47,10 +47,10 @@ public:
 		
 		// check to see if bundle contains message of type T, if not, throw error
 		// TODO: Throw a real exception!
-		if (map.count(T::MessageType) == 0) { std::cerr << "BundleAccess::readRef(...): Error! No message of requested type!"; std::exit(0); }
+		if (map.count(T::GetMessageType()) == 0) { std::cerr << "BundleAccess::readRef(...): Error! No message of requested type!"; std::exit(0); }
 		
 		// get the message.
-		boost::any& wrapped = map[T::MessageType];
+		boost::any& wrapped = map[T::GetMessageType()];
 		
 		// http://www.boost.org/doc/libs/1_42_0/doc/html/boost/any_cast.html
 		return *boost::any_cast<T>(&wrapped);
@@ -65,9 +65,9 @@ public:
 
 			// check to see if bundle alrady contains message of type T. 
 			// if so, return false to indicate failure.
-			if (map.count(T::MessageType) == 1) { return false; }
+			if (map.count(T::GetMessageType()) == 1) { return false; }
 			
-			map[T::MessageType] = boost::any(message);
+			map[T::GetMessageType()] = boost::any(message);
 			
 			return true;
 	}
@@ -76,7 +76,7 @@ public:
 	{
 		// get the map from the bundle
 		MessageBundle::MessageMap& map = getMap(*bundle.get());
-		return (map.find(T::MessageType) != map.end());
+		return (map.find(T::GetMessageType()) != map.end());
 	}
 };
 	

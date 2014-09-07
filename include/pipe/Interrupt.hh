@@ -36,7 +36,12 @@ struct Interrupt : public Message
 		os << MessageType << ": type = " << static_cast<std::underlying_type<Type>::type>(type);
 	}
 	
-	const static std::string MessageType;
+	static const std::string& GetMessageType()
+	{
+		static std::string MessageType = "pipe::Interrupt";
+		return MessageType;
+	}
+	
 	Type type;
 };
 	

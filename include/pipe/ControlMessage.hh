@@ -26,7 +26,12 @@ struct ControlMessage : public Message
 		SOFT_RESET
 	};
 	
-	static const std::string MessageType;
+	static const std::string& GetMessageType()
+	{
+		static std::string MessageType = "utkVme::pipe::ControlMessage";
+		return MessageType;
+	}
+	
 	Type type;
 	
 	ControlMessage(Type t = Type::NORMAL)

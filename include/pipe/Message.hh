@@ -26,6 +26,10 @@ public:
 
 } // namespace pipe
 
-std::ostream& operator << (std::ostream& os, const utkVme::pipe::Message& m);
+inline std::ostream& operator << (std::ostream& os, const pipe::Message& m)
+{
+	m.serialize(os);
+	return os;
+}
 
 #endif

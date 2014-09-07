@@ -141,6 +141,7 @@ protected:
 			ControlMessage cm(ControlMessage::Type::SHUTDOWN);
 			if(false == controlAccess.attachTo(bundle, cm))
 			{
+				// TODO: throw error instead	
 				std::cerr << "Pipeline::processData, already a control " 
 								"message in bundle somehow!\n";
 			}
@@ -177,6 +178,7 @@ protected:
 	
 		if(false == controlAccess.attachTo(bundle, cm))
 		{
+			// TODO: throw error instead
 			std::cerr << "Pipeline::processEndOfLine, already a control " 
 							"message in bundle somehow!\n";
 		}
