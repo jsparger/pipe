@@ -62,11 +62,11 @@ public:
 		{
 			// Wait until Module B is waiting to accept new data.
 			// (We can only acquire a lock on the mutex when Module B is
-			// waiting)
+			// waiting) This requires locking on m.
 			// Also, wait for data to be unlocked. This means the data has been
 			// processed and is now trash. 
-			std::lock_guard<std::mutex> plock(dataMutex);			
-			std::lock_guard<std::mutex> tmplock(m);
+			std::lock_guard<std::mutex> wantsDataLock(dataMutex);			
+			std::lock_guard<std::mutex> isWaitingLock(m);
 					
 			// Module B has already passed on the bundle it was working with.
 			// The contents of "bundle" are now trash. Swap them for the fresh
