@@ -17,26 +17,35 @@
 
 namespace pipe {
 
+/// \class MessageBundle
+/// \brief Class used to pass data between modules.
+///
+/// The MessageBundle class is used to pass data between modules. Internally it maps pieces of data to a name, which can be used to retrieve the data from the MessageBundle later. Access to the message bundle contents is handled by an Accessor. The provided accessors BundleAccess and BundleAccessByName should cover most use cases, but the user is free to implement their own accessor if needed.
+
 class MessageBundle
 {
 public:
 	MessageBundle() {;}
 	typedef std::map<std::string,boost::any> MessageMap;
+	
 private:
-
+	/// A type erased map for storing data.
 	MessageMap map;
 	friend class Accessor;
+	
 public:
-	// this inner class (automatically a friend) will provide access
-	// to the contents of the message bundle. They shouldn't really
-	// be messed with in their boost::any state by any user code, so
-	// this means you really have to try to access them. Inherit from
-	// this class to gain the ability to access the guts of a bundle.
+	
+	/// \class Accessor
+	/// \brief This inner class will provide access to the contents of a MessageBundle.
+	///
+	/// The Accessor inner class will provide access to the contents of a MessageBundle. It is desirable to hide the type erasure of boost::any from user code, so this hurdle was added. Inherit from this class to gain the ability to access the guts of a bundle.
 	class Accessor
 	{
 	public:
+		/// Destructor
 		virtual ~Accessor() {;}
 	protected:
+		/// Get the type erased map from the MessageBundle.
 		virtual MessageMap& getMap(MessageBundle& b) final
 		{
 			return b.map;

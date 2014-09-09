@@ -33,14 +33,14 @@ class Module
 public:
 	/// Constructor. Initializes module to safe state.
 	Module()
-		: 	next(0), newDataReady(false), isAlive(true), lock(m), 
+		: 	next(0), newDataReady(false), isAlive(true), waitLock(waitMutex), 
 			dataLock(dataMutex), bundle(new MessageBundle)
 	{
 		// initial state is:
 		// no module connected.
 		// we do not have new data ready for us to process
-		// the mutex is locked.
-		// bundle is null
+		// the waiting mutex is locked. (module not yet in waiting state)
+		// bundle is empty
 		// data is invalid (so unlocked)
 		dataLock.unlock();
 	}
@@ -66,7 +66,7 @@ public:
 			// Also, wait for data to be unlocked. This means the data has been
 			// processed and is now trash. 
 			std::lock_guard<std::mutex> wantsDataLock(dataMutex);			
-			std::lock_guard<std::mutex> isWaitingLock(m);
+			std::lock_guard<std::mutex> isWaitingLock(waitMutex);
 					
 			// Module B has already passed on the bundle it was working with.
 			// The contents of "bundle" are now trash. Swap them for the fresh
@@ -118,7 +118,7 @@ protected:
 		// we are in the waiting state and re-acquired as soon as we wake up.
 		// We will confirm that we were not spuriously awakened by checking
 		// for newDataReady == true.
-		cv.wait(lock, [this]{return this->newDataReady;});
+		cv.wait(waitLock, [this]{return this->newDataReady;});
 		// set the newDataReady flag to false.
 		newDataReady = false;
 	}
@@ -171,7 +171,7 @@ protected:
 	{
 		// unlock mutex to allow any thread currently blocked
 		// pushing data to us to complete.
-		lock.unlock();
+		waitLock.unlock();
 	}
 	
 	/// A hook which is called whenever a soft-reset controll message is received.
@@ -183,9 +183,8 @@ protected:
 	Module* next;
 	bool newDataReady;
 	bool isAlive;
-	std::mutex m, dataMutex;
-	std::unique_lock<std::mutex> lock;
-	std::unique_lock<std::mutex> dataLock;
+	std::mutex waitMutex, dataMutex;
+	std::unique_lock<std::mutex> waitLock, dataLock;
 	std::condition_variable cv;
 	/// The message bundle. To be accessed directly by user modules in their processData() implementation.
 	std::unique_ptr<MessageBundle> bundle;
