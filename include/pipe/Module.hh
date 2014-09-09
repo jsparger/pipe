@@ -8,6 +8,9 @@
 // See https://github.com/jsparger/pipe for more information.
 //---------------------------------------------------------------------------//
 
+/// @file Module.hh
+/// @brief dogtime all the way
+
 #ifndef PIPE_MODULE_HH
 #define PIPE_MODULE_HH
 
@@ -20,9 +23,15 @@
 
 namespace pipe {
 
+/// \class Module
+/// \brief Abstract base class for modules in an analysis pipeline.
+///
+/// The Module class is the abstract base class for modules in analysis pipeline. To create a new Module, the user needs only to inherit from Module and provide the processData() member function. The Module base class handles receiving and passing data to other modules in a thread safe way, as well as inspecting bundles for control messages. Several other member functions can be overriden if the user requires access to different parts of the module's operational cycle.
+
 class Module
 {
 public:
+	/// Constructor. Initializes module to safe state.
 	Module()
 		: 	next(0), newDataReady(false), isAlive(true), lock(m), 
 			dataLock(dataMutex), bundle(new MessageBundle)
@@ -36,8 +45,10 @@ public:
 		dataLock.unlock();
 	}
 	
+	/// Destructor
 	virtual ~Module() {;}
 	
+	/// called by previous module in chain to give this module its message bundle.
 	virtual void push(std::unique_ptr<MessageBundle> newBundle)
 	{	
 		// don't accept the data
@@ -46,7 +57,7 @@ public:
 			return;
 		}
 	
-		// this method is called by an external thread, so let's
+		// this member function is called by an external thread, so let's
 		// describe it from the external module's (Module A's) perspective:
 		{
 			// Wait until Module B is waiting to accept new data.
@@ -73,6 +84,7 @@ public:
 		cv.notify_one();
 	}
 	
+	/// Connects a module to this module. Returns the newly connected module to enable chained calls.
 	virtual Module& connect(Module& module)
 	{
 		// connect the module
@@ -80,7 +92,8 @@ public:
 		return module;	
 	}
 	
-	virtual void operator()(bool persist = false)
+	/// Starts the module's operation. If \p persist is false the module will only process one cycle
+	virtual void operator()(bool persist = true)
 	{	
 		initialize();
 	
@@ -97,6 +110,8 @@ public:
 	}
 	
 protected:
+	
+	/// This member function is called after the current message bundle has been processed. It blocks until a fresh message bundle has been pushed to the module.
 	virtual void waitForData()
 	{
 		// wait to be notified that new data is ready. Lock is released while
@@ -108,6 +123,7 @@ protected:
 		newDataReady = false;
 	}
 	
+	/// Processes control messages to trigger various callbacks such as reset() and shutDown().
 	virtual void processControlMessage()
 	{
 		ControlMessage m;
@@ -123,14 +139,17 @@ protected:
 		}
 	}
 	
+	/// Called when a shutdown control message is received.
 	virtual void shutDown()
 	{
 		// change our alive status to false.
 		isAlive = false;
 	}
 	
+	/// This member function should be implemented to define the functionality of user modules. This member function is called during every cycle of the module to process the message bundle that was received. The user can use this hook to inspect the message bundle, do work with its contents, and attach new data.
 	virtual void processData() = 0;
 	
+	/// Pushes data to the next module in the chain and allows new data to be pushed to this module
 	virtual void pushData()
 	{
 		// push the bundle on to the next module in the chain.
@@ -141,11 +160,13 @@ protected:
 		dataLock.unlock();
 	}
 	
+	/// A hook to perform any post-constructor initialization the module might need.
 	virtual void initialize()
 	{
 		// do nothing
 	}
 	
+	/// A hook to perform any cleanup a module might need to do before execution is shutdown. This is the last function called on the last cycle of execution. If this function is overridden, the base class version (this version) should also be invoked for proper behavior.
 	virtual void cleanUp()
 	{
 		// unlock mutex to allow any thread currently blocked
@@ -153,6 +174,7 @@ protected:
 		lock.unlock();
 	}
 	
+	/// A hook which is called whenever a soft-reset controll message is received.
 	virtual void reset()
 	{
 		// do nothing
@@ -165,6 +187,7 @@ protected:
 	std::unique_lock<std::mutex> lock;
 	std::unique_lock<std::mutex> dataLock;
 	std::condition_variable cv;
+	/// The message bundle. To be accessed directly by user modules in their processData() implementation.
 	std::unique_ptr<MessageBundle> bundle;
 	BundleAccess<ControlMessage> controlAccess;
 };
