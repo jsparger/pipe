@@ -36,7 +36,7 @@ private:
 public:
 	
 	/// \class Accessor
-	/// \brief This inner class will provide access to the contents of a MessageBundle.
+	/// \brief Provides access to the contents of a MessageBundle.
 	///
 	/// The Accessor inner class will provide access to the contents of a MessageBundle. It is desirable to hide the type erasure of boost::any from user code, so this hurdle was added. Inherit from this class to gain the ability to access the guts of a bundle.
 	class Accessor

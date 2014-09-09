@@ -11,12 +11,6 @@
 #ifndef PIPE_PIPELINE_HH
 #define PIPE_PIPELINE_HH
 
-// John Sparger: jsparger@utk.edu
-// Pipeline is a special module that takes care of launching
-// the modules, generating the bundles, and handling interrupts
-// to terminate execution in the pipeline. Every group of modules
-// should start with a Pipeline module.
-
 #include <thread>
 #include <vector>
 #include "pipe/Module.hh"
@@ -24,9 +18,15 @@
 
 namespace pipe {
 
+/// \class Pipeline
+/// \brief A special Module that goes at the beginning of a an analysis pipeline.
+///
+/// Pipeline is a special module that takes care of launching the modules in a chain, generating the bundles, and handling interrupts to terminate execution in the pipeline. Every group of modules should start with a Pipeline module.
+
 class Pipeline : public Module
 {
 public:
+	/// Constructor.
 	Pipeline()
 		: 	terminateSignal(false)
 	{
@@ -35,8 +35,10 @@ public:
 		dataLock.lock();
 	}
 	
+	/// Destructor
 	virtual ~Pipeline() {;}
 	
+	/// connect a module to the end of the pipeline. This has a different chaining mechanism than calling connect on another module. Calling connect on a Module in the chain will not have the same effect as calling connect on the Pipeline.
 	virtual Module& connect(Module& m) override
 	{
 
@@ -61,17 +63,20 @@ public:
 		return *this;
 	}
 	
-	// not an override <-- the chaining doesn't really work
-	virtual Pipeline& connect(std::unique_ptr<Module> m)
-	{
-		// in this case, tbe lifetime of the module m will
-		// be tied to the lifetime of the pipeline. store the 
-		// unique_ptr and connect as usual.
-		ownedModuleVec.push_back(std::move(m));
-		return static_cast<Pipeline&>(connect(*ownedModuleVec.back()));
-	} 
+	// // not an override <-- the chaining doesn't really work
+	// virtual Pipeline& connect(std::unique_ptr<Module> m)
+	// {
+	// 	//TODO: this whole method looks wrong.
+	// 	// in this case, tbe lifetime of the module m will
+	// 	// be tied to the lifetime of the pipeline. store the
+	// 	// unique_ptr and connect as usual.
+	// 	ownedModuleVec.push_back(std::move(m));
+	// 	// TODO: this looks wrong
+	// 	return static_cast<Pipeline&>(connect(*ownedModuleVec.back()));
+	// }
 	
-	virtual void operator()(bool persist) override
+	/// Starts the pipeline's operation. This will launch each module in its own thread and begin this module (Pipeline's) own operational cycle.
+	virtual void operator()(bool persist = true) override
 	{
 		// Check to see if any modules are attached.
 		// If there are no modules, we have nothing to do, so return.
@@ -114,7 +119,7 @@ public:
 		}	
 	}
 	
-	// thread-safe
+	/// Call this method externally to force a shutdown signal to be sent through the pipeline. This method is threadsafe.
 	virtual void terminate()
 	{
 		// to be called externally. Forces shutdown signal to be sent.
@@ -122,7 +127,9 @@ public:
 		terminateSignal = true;	
 	} 
 	
-protected:	
+protected:
+	
+	/// Provides a new MessageBundle to the pipeline, checks for Interrupt messages, checks for termination, and provides ControlMessages.
 	virtual void processData() override
 	{
 		// we are connected to the last module in the chain, so the
@@ -152,6 +159,7 @@ protected:
 		}
 	}
 	
+	///  Helper function that hecks for Interrupts and writes the corresponding ControlMessage to the MessageBundle.
 	virtual void processEndOfLine(std::unique_ptr<MessageBundle>& eol)
 	{
 		// check for an interrupt
