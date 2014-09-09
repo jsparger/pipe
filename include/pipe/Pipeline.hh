@@ -38,7 +38,7 @@ public:
 	/// Destructor
 	virtual ~Pipeline() {;}
 	
-	/// connect a module to the end of the pipeline. This has a different chaining mechanism than calling connect on another module. Calling connect on a Module in the chain will not have the same effect as calling connect on the Pipeline.
+	/// connect a module to the end of the pipeline. This has a different chaining mechanism than calling connect on another module. Calling connect on a Module in the chain will not have the same effect as calling connect on the Pipeline. For appropriate behavior, connect all modules to the pipeline object and not each other.
 	virtual Module& connect(Module& m) override
 	{
 

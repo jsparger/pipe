@@ -73,13 +73,13 @@ struct BundlePrinter<T,Args...>
 		{
 			if(printAll)
 			{
-				std::cout <<  T::MessageType << ": no message!\n";
+				std::cout <<  T::GetMessageType() << ": no message!\n";
 				printedSomething = true; 
 			}
 		}
 		else
 		{
-			std::cout << T::MessageType << ":\n"<< message << "\n";
+			std::cout << T::GetMessageType() << ":\n"<< message << "\n";
 			printedSomething = true; 
 		}
 		
@@ -89,20 +89,28 @@ struct BundlePrinter<T,Args...>
 };
 
 
+/// \class BundlePrintModule
+/// \brief A module used to print out the contents of a MessageBundle. 
+///
+/// The bundle printer will print out the contents of messages in a bundle. It will print out the types of messages given in \p Args. These messages must both be serializable and have a GetMessageType() method. This class is implemented with variadic templates.
 template <class... Args>
 class BundlePrintModule : public Module
 {
 public:
+	/// Constructor. Flag \p printAlways is used to indicate whether a message should be printed whether it exists in the bundle or not. In this case, it will print an indication that the message did not exist. Default value is false.
 	BundlePrintModule(bool printAlways = false) 
 		: printAll(printAlways)
 		{
 			// do nothing else;
 		}
+	
+	/// Destructor.
 	virtual ~BundlePrintModule() {;}
 	
 protected:
 	bool printAll;
 
+	/// Prints out the message types in the bundle as specified by the template parameters Args.
 	virtual void processData() override
 	{
 		BundlePrinter<Args...> bp(printAll);
