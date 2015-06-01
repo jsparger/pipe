@@ -13,7 +13,7 @@
 
 #include "pipe/Message.hh"
 
-namespace piper {
+namespace pipe {
 
 /// \class Interrupt
 /// \brief A Message used by a module to signal state to the controller

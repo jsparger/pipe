@@ -15,7 +15,7 @@
 #include <string>
 #include <type_traits>
 
-namespace piper {
+namespace pipe {
 
 /// \class ControlMessage
 /// \brief A Message used to control the behavior of modules.

@@ -41,8 +41,8 @@ public:
 		if (map.count(T::GetMessageType()) == 0) { return false; }
 		
 		// get the message. Store the unwrapped object in "message" and signal success.
-		boost::any wrapped = map[T::GetMessageType()];
-		message = boost::any_cast<T>(wrapped);
+		core::any wrapped = map[T::GetMessageType()];
+		message = core::any_cast<T>(wrapped);
 		return true;
 	}
 	
@@ -57,10 +57,11 @@ public:
 		if (map.count(T::GetMessageType()) == 0) { std::cerr << "BundleAccess::readRef(...): Error! No message of requested type!"; std::exit(0); }
 		
 		// get the message.
-		boost::any& wrapped = map[T::GetMessageType()];
+		core::any& wrapped = map[T::GetMessageType()];
 		
 		// http://www.boost.org/doc/libs/1_42_0/doc/html/boost/any_cast.html
-		return *boost::any_cast<T>(&wrapped);
+		// as of may 31 using core library from https://github.com/mnmlstc/core
+		return *core::any_cast<T>(&wrapped);
 	}
 	
 	/// Attach the message of type T to the bundle. Returns false if message of type T has already been attached to bundle
@@ -73,7 +74,7 @@ public:
 			// if so, return false to indicate failure.
 			if (map.count(T::GetMessageType()) == 1) { return false; }
 			
-			map[T::GetMessageType()] = boost::any(message);
+			map[T::GetMessageType()] = core::any(message);
 			
 			return true;
 	}
@@ -113,8 +114,8 @@ public:
 		auto it = map.find(name);
 		// TODO: throw a real error.
 		if (map.end() == it) { std::cerr << "BundleAccess::readRef(...): Error! No message of requested type!"; std::exit(0); }
-		boost::any& theAny = it->second;
-		T* ret = boost::any_cast<T>(&theAny);
+		core::any& theAny = it->second;
+		T* ret = core::any_cast<T>(&theAny);
 		return *ret;
 	}
 	
@@ -123,7 +124,7 @@ public:
 	{
 		// get the map from the bundle
 		auto& map = getMap(*bundle);
-		auto pair = map.emplace(name, boost::any(message));
+		auto pair = map.emplace(name, core::any(message));
 		std::cout << "insert = " << pair.second << "\n";
 		return pair.second;
 	}

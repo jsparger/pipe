@@ -13,7 +13,7 @@
 
 #include <ostream>
 
-namespace piper {
+namespace pipe {
 
 /// \class Message
 /// \brief An abstract base class for messages.
@@ -31,7 +31,7 @@ public:
 } // namespace pipe
 
 /// an overload for the stream input operator for Messages.
-inline std::ostream& operator << (std::ostream& os, const piper::Message& m)
+inline std::ostream& operator << (std::ostream& os, const pipe::Message& m)
 {
 	m.serialize(os);
 	return os;

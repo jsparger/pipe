@@ -21,7 +21,7 @@
 #include <condition_variable>
 #include <mutex>
 
-namespace piper {
+namespace pipe {
 
 /// \class Module
 /// \brief Abstract base class for modules in an analysis pipeline.

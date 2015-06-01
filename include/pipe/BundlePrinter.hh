@@ -14,7 +14,7 @@
 #include "utkVme/pipe/Module.hh"
 #include "utkVme/pipe/BundleAccess.hh"
 
-namespace piper {
+namespace pipe {
 
 // VERSION A:
 // this class will only be instantiated when the parameter pack

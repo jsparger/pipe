@@ -13,9 +13,10 @@
 
 #include <map>
 #include <string>
-#include <boost/any.hpp>
+//https://github.com/mnmlstc/core
+#include <core/any.hpp>
 
-namespace piper {
+namespace pipe {
 
 /// \class MessageBundle
 /// \brief Class used to pass data between modules.
@@ -26,7 +27,7 @@ class MessageBundle
 {
 public:
 	MessageBundle() {;}
-	typedef std::map<std::string,boost::any> MessageMap;
+	typedef std::map<std::string,core::any> MessageMap;
 	
 private:
 	/// A type erased map for storing data.
