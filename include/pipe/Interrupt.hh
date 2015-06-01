@@ -13,7 +13,7 @@
 
 #include "pipe/Message.hh"
 
-namespace pipe {
+namespace piper {
 
 /// \class Interrupt
 /// \brief A Message used by a module to signal state to the controller
@@ -42,7 +42,7 @@ struct Interrupt : public Message
 	/// An override from message which will print out details of the message.
 	virtual void serialize(std::ostream& os) const override
 	{
-		os << MessageType << ": type = " << static_cast<std::underlying_type<Type>::type>(type);
+		os << GetMessageType() << ": type = " << static_cast<std::underlying_type<Type>::type>(type);
 	}
 	
 	/// A static method allowing this class to be used by BundleAccess. Provides the type of message. Note that the type of this message is "pipe::Interrupt" and not the interrupt type chosen in the constructor.

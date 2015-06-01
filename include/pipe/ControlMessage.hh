@@ -15,7 +15,7 @@
 #include <string>
 #include <type_traits>
 
-namespace pipe {
+namespace piper {
 
 /// \class ControlMessage
 /// \brief A Message used to control the behavior of modules.
@@ -45,7 +45,7 @@ struct ControlMessage : public Message
 	/// An override from message which will print out details of the message.
 	virtual void serialize(std::ostream& os) const override
 	{
-		os << MessageType << ": type = " << static_cast<std::underlying_type<Type>::type>(type);
+		os << GetMessageType() << ": type = " << static_cast<std::underlying_type<Type>::type>(type);
 	}
 	
 	/// A static method allowing this class to be used by BundleAccess. Provides the type of message. Note that the type of this message is "pipe::ControlMessage" and not the control message type chosen in the constructor.
@@ -59,7 +59,6 @@ struct ControlMessage : public Message
 	Type type;
 	
 };
-
 
 } // namespace pipe
 

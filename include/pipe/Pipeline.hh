@@ -16,7 +16,7 @@
 #include "pipe/Module.hh"
 #include <atomic>
 
-namespace pipe {
+namespace piper {
 
 /// \class Pipeline
 /// \brief A special Module that goes at the beginning of a an analysis pipeline.

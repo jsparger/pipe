@@ -15,7 +15,7 @@
 #include <string>
 #include <boost/any.hpp>
 
-namespace pipe {
+namespace piper {
 
 /// \class MessageBundle
 /// \brief Class used to pass data between modules.

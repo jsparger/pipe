@@ -14,7 +14,7 @@
 #include "utkVme/pipe/Module.hh"
 #include "utkVme/pipe/BundleAccess.hh"
 
-namespace pipe {
+namespace piper {
 
 // VERSION A:
 // this class will only be instantiated when the parameter pack
@@ -32,7 +32,7 @@ struct BundlePrinter
 		// do nothing else;
 	}
 	
-	void print(std::unique_ptr<utkVme::pipe::MessageBundle>& b)
+	void print(std::unique_ptr<MessageBundle>& b)
 	{
 		// parameter pack is empty
 		if (printedSomething)
@@ -59,9 +59,9 @@ struct BundlePrinter<T,Args...>
 		// do nothing else;
 	}
 	
-	void print(std::unique_ptr<utkVme::pipe::MessageBundle>& b)
+	void print(std::unique_ptr<MessageBundle>& b)
 	{
-		utkVme::pipe::BundleAccess<T> access;
+		BundleAccess<T> access;
 		T message;
 		
 		if(!b)
